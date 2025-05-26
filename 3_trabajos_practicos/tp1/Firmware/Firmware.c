@@ -12,7 +12,8 @@ void Vtask_Led_On(void *params);
 void Vtask_Led_Off(void *params);
 void VTaskDelete(void *params);
 
-
+#define LED_ON_TIME 1000 
+#define LED_OFF_TIME 1500 
 
 
 
@@ -26,8 +27,8 @@ void Vtask_Led_On(void *params) {
 
          cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
          printf("Prendo led\n");
-        // Demora de ticks equivalentes a 1700 ms (200 + 1500)
-        vTaskDelay(pdMS_TO_TICKS(1700));
+        // Demora de ticks equivalentes a un ciclo completo (1000 + 1500)
+        vTaskDelay(pdMS_TO_TICKS(LED_ON_TIME + LED_OFF_TIME));
 
     }
 }
@@ -37,13 +38,13 @@ void Vtask_Led_Off(void *params) {
     
     while(1) {
 
-        // Demora de ticks equivalentes a 200 ms
-        vTaskDelay(pdMS_TO_TICKS(200));
+        // Demora de ticks equivalentes a tiempo encendido en ms
+        vTaskDelay(pdMS_TO_TICKS(LED_ON_TIME));
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
         printf("Apago led\n");
-        // Demora de ticks equivalentes a 1500 ms
-        // Total de demora 1700
-        vTaskDelay(pdMS_TO_TICKS(1500));
+        // Demora de ticks equivalentes a tiempo apagado en ms
+        // Total del ciclo es LED_ON_TIME mas LED_OFF_TIME
+        vTaskDelay(pdMS_TO_TICKS(LED_OFF_TIME));
 
     }
 }
@@ -63,8 +64,8 @@ int main(void) {
     
 // Creacion de tareas
 
-xTaskCreate(Vtask_Led_On, "Vtask_Led_On", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
-xTaskCreate(Vtask_Led_Off, "Vtask_Led_Off", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+xTaskCreate(Vtask_Led_On, "Vtask_Led_On", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+xTaskCreate(Vtask_Led_Off, "Vtask_Led_Off", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 
 
 
